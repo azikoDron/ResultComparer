@@ -1,0 +1,16 @@
+{% extends 'results/base.html' %}
+
+
+{% block title %} {{app_detail}} app {% endblock title %}
+
+
+{% block content %}
+
+    {% if app_detail %}
+        <p>Tis is {{app_detail}} app</p>
+        <p>{{app_detail.about}}</p>
+    {% else %}
+        <p>App is currently not available</p>
+    {% endif %}
+
+{% endblock content %}

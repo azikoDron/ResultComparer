@@ -1,0 +1,26 @@
+{% extends 'results/base.html' %}
+
+{% load static %}
+
+{% block title %} All apps {% endblock title %}
+
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static 'results/css/index.css' %}">
+{% endblock additional_css %}
+
+
+{% block content %}
+
+    <p>Available apps</p>
+    {% if available_apps %}
+        <ul>
+        {% for app in available_apps %}
+            <li><a href="{% url 'detail' app_id=app %}">{{app}}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No apps are available.</p>
+    {% endif %}
+
+{% endblock content %}

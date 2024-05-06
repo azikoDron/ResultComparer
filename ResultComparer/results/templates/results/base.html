@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        {% endblock title %}
+    </title>
+    <!--  Block to add additional css  -->
+    {% block additional_css %}
+    {% endblock additional_css %}
+    {% include  './includes/navbar.html' %}
+</head>
+<body>
+    {% block navbar %}
+    {% endblock navbar %}
+
+    {% block content %}
+
+    {% endblock content %}
+</body>
+</html>
