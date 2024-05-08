@@ -1,0 +1,51 @@
+
+{% include  './detail.html' %}
+
+{% block title %} {{app_detail}} app {% endblock title %}
+
+
+{% block content %}
+    {% load static %}
+    {% for tran in results %}
+        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran.transaction}}</a></li>
+    {% endfor %}
+
+    {% if results %}
+        <p>{{results}}</p>
+
+        {% for result in results %}
+            <p>{{result.transaction}} - {{result.mean}}</p>
+        {% endfor %}
+
+
+        <div id="container" style="width: 50%;">
+            <canvas id="chart" \></canvas>
+        </div>
+        <script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
+        <script>
+            var config = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: ['1','2','3','4'],
+                        backgroundColor: "#4E4D4D",
+                        }],
+                labels: ['a', 'b', 'c', 'd']
+                },
+                options: {
+                    responsive: true
+                    }
+                };
+            window.onload = function() {
+                ctx = document.getElementById('chart').getContext('2d');
+                window.myPie = new Chart(ctx, config);
+                };
+
+        </script>
+
+
+    {% else %}
+        <p>App is currently not available</p>
+    {% endif %}
+
+{% endblock content %}
