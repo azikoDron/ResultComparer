@@ -1,37 +1,46 @@
 
 {% include  './detail.html' %}
 
-{% block title %} {{app_detail}} app {% endblock title %}
+{% block title %} {{app_detail}} {% endblock title %}
 
 
 {% block content %}
     {% load static %}
-    {% for tran in results %}
-        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran.transaction}}</a></li>
+    {% for tran in results.keys %}
+        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran}}</a></li>
     {% endfor %}
 
-    {% if results %}
-        <p>{{results}}</p>
+<!--    {% if results %}-->
+<!--        <p>{{results}}</p>-->
 
-        {% for result in results %}
-            <p>{{result.transaction}} - {{result.mean}}</p>
-        {% endfor %}
+<!--        {% for result in results %}-->
+<!--            <p>{{result.transaction}} - {{result.mean}}</p>-->
+<!--        {% endfor %}-->
 
 
         <div id="container" style="width: 50%;">
             <canvas id="chart" \></canvas>
         </div>
-        <script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
-        <script>
+<script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
+<script>
             var config = {
                 type: 'line',
                 data: {
-                    datasets: [{
-                        data: ['1','2','3','4'],
-                        backgroundColor: "#4E4D4D",
-                        }],
-                labels: ['a', 'b', 'c', 'd']
-                },
+                    labels: {% for timedata in results.values %}
+                                [{% for result in timedata.0 %} '{{result.time}}', {% endfor %}]
+                            {% endfor %},
+                    datasets: [
+                    {% for transactions, timedata in results.items %}
+                            {
+                            label: '{{transactions}}',
+                            data: [{% for result in timedata %} {{result.mean}}, {% endfor %}],
+
+                            },
+
+                    {% endfor %}
+                            ],
+
+                    },
                 options: {
                     responsive: true
                     }

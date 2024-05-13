@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:app_id>/detail', views.detail, name='detail'),
-    path('<str:app_id>/detail', views.detail, name='detail'),
-    path('<str:transaction_id>/results', views.show_influx_data, name='show_influx_data'),
+    path('detail/<int:app_id>/', views.detail, name='detail'),
+    path('detail/<str:app_id>/', views.detail, name='detail'),
+    path('results/', views.show_influx_data, name='show_influx_data'),
+    path('results/<str:transaction_id>/', views.show_influx_data, name='show_influx_data'),
 ]

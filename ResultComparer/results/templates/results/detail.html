@@ -8,23 +8,31 @@
 <p></p>
 <p></p>
 
-<label for="start">Start date:</label>
-<input type="date" id="start_date" name="start_date" value="2024-05-08" min="2024-01-01" />
-<input type="time" id="start_time" name="start_time" value="09:00" min="00:00" max="24:00" required />
+<form action="{% url 'show_influx_data' %}" method="post">
+    {% csrf_token %}
+    <label for="start">Start date:</label>
+    <input type="date" id="start_date" name="start_date" value="2024-05-08" min="2024-01-01" />
+    <input type="time" id="start_time" name="start_time" value="09:00" min="00:00" max="24:00" required />
 
-<label for="end">End date:</label>
-<input type="date" id="end_date" name="end_date" value="2024-05-08" min="2024-01-01" />
-<input type="time" id="end_time" name="end_time" value="18:00" min="00:00" max="24:00" required />
-
+    <label for="end">End date:</label>
+    <input type="date" id="end_date" name="end_date" value="2024-05-08" min="2024-01-01" />
+    <input type="time" id="end_time" name="end_time" value="18:00" min="00:00" max="24:00" required />
+    <input type="submit" value="Submit">
+</form>
+<!--<form action="{% url 'show_influx_data' %}" method="post">-->
+<!--    {% csrf_token %}-->
+<!--    {{ form }}-->
+<!--    <input type="submit" value="Submit">-->
+<!--</form>-->
 
     {% if app_detail %}
         <p>Tis is {{app_detail}} app</p>
         <p>{{app_detail.about}}</p>
 
     {% elif results %}
-        {% for tran in results %}
-        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran.transaction}}</a></li>
-        {% endfor %}
+<!--        {% for tran in results %}-->
+<!--        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran.transaction}}</a></li>-->
+<!--        {% endfor %}-->
     {% else %}
         <p>App is currently not available</p>
     {% endif %}
