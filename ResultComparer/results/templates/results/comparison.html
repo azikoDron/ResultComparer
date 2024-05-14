@@ -7,11 +7,11 @@
 {% block content %}
     {% load static %}
     {% for tran in results.keys %}
-        <li><a href="{% url 'show_influx_data' transaction_id=tran %}">{{tran}}</a></li>
+        <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
     {% endfor %}
 
-<!--    {% if results %}-->
-<!--        <p>{{results}}</p>-->
+    {% if results %}
+        <p>{{time_interval}}</p>
 
 <!--        {% for result in results %}-->
 <!--            <p>{{result.transaction}} - {{result.mean}}</p>-->
@@ -26,20 +26,18 @@
             var config = {
                 type: 'line',
                 data: {
-                    labels: {% for timedata in results.values %}
-                                [{% for result in timedata.0 %} '{{result.time}}', {% endfor %}]
-                            {% endfor %},
+
                     datasets: [
                     {% for transactions, timedata in results.items %}
                             {
                             label: '{{transactions}}',
                             data: [{% for result in timedata %} {{result.mean}}, {% endfor %}],
-
+                            backgroundColor: "{{ colours.chart_colour_picker }}",
                             },
 
                     {% endfor %}
                             ],
-
+                    labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
                     },
                 options: {
                     responsive: true

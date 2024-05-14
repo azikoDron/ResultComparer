@@ -8,7 +8,7 @@
 <p></p>
 <p></p>
 
-<form action="{% url 'show_influx_data' %}" method="post">
+<form action="{% url 'show_timeseries_db_data' %}" method="post">
     {% csrf_token %}
     <label for="start">Start date:</label>
     <input type="date" id="start_date" name="start_date" value="2024-05-08" min="2024-01-01" />
