@@ -8,7 +8,7 @@ import datetime
 class InfluxConnect:
     pass
 # DELETE
-def gen_test_data():    # delete
+def gen_test_data(start_time="", end_time=""):    # delete
     data_dict = {}
     for i in range(10):
         data_dict[f"tran-{i}"] = [{"time": time.strftime("%FT%H:03:%S:00Z"),

@@ -1,7 +1,7 @@
 from django.db import models
 import random
-from influx_db import InfluxConnect
-from ResultComparer.ResultComparer.settings import TIMESERIES_DATABASES
+from .influx_db import InfluxConnect
+from .settings import TIMESERIES_DATABASES
 import datetime
 import re
 
