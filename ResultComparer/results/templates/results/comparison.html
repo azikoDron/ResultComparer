@@ -31,7 +31,9 @@
                     {% for transactions, timedata in results.items %}
                             {
                             label: '{{transactions}}',
-                            data: [{% for result in timedata %} {{result.mean}}, {% endfor %}],
+                            data: [{% for result in timedata %}
+                                                "{{result.mean}}",
+                                            {% endfor %}],
                             backgroundColor: "{{ colours.chart_colour_picker }}",
                             },
 

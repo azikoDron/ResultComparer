@@ -69,3 +69,20 @@ class TimeSeriesDB:
                         continue
         return sorted(list(set(time_list)))
 
+
+class Transactions(models.Model):
+    name = models.CharField(max_length=120)
+
+
+class SaveData(models.Model):
+    transaction = person = models.ForeignKey(Transactions, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    pct99 = models.FloatField(null=True)
+    pct95 = models.FloatField(null=True)
+    pct90 = models.FloatField(null=True)
+    min = models.FloatField(null=True)
+    max = models.FloatField(null=True)
+    avg = models.FloatField(null=True)
+
+    def __str__(self):
+        return {self}

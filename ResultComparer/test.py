@@ -63,5 +63,5 @@ def chart_colour_picker(length):
     return random.choice(hex_colours)
 
 
-for i in range(25):
-    print(chart_colour_picker())
+print((datetime.datetime.strptime("2024-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f") -
+      datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds())

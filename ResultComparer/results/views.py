@@ -23,14 +23,20 @@ def detail(request, app_id):
     return render(request, 'results/detail.html')
 
 
+start_time = ""
+end_time = ""
+
 def show_timeseries_db_data(request, transaction_id=""):
+    global start_time, end_time
     if request.method == "POST":
         start_time = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
         end_time = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
         # print("------------------------------------:  ", start_time, end_time)
 
         data = get_influx_data(start_time=start_time, end_time=end_time, transaction=transaction_id)
+    else:
+        data = get_influx_data(start_time=start_time, end_time=end_time, transaction=transaction_id)
 
-        return render(request, 'results/comparison.html', {"results": data["data"],
+    return render(request, 'results/comparison.html', {"results": data["data"],
                                                            "time_interval": data["time_interval"],
                                                            "colours": Colours()})
