@@ -12,15 +12,24 @@
 
 {% block content %}
 
-    <p>Available apps</p>
-    {% if available_apps %}
-        <ul>
-        {% for app in available_apps %}
-            <li><a href="{% url 'detail' app_id=app %}">{{app}}</a></li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No apps are available.</p>
-    {% endif %}
+<p></p>
+<p>Select time interval</p>
+
+<form action="{% url 'show_timeseries_db_data' %}" method="post">
+    {% csrf_token %}
+    <label for="start">Start date:</label>
+    <input type="date" id="start_date" name="start_date" value="2024-05-08" min="2024-01-01" />
+    <input type="time" id="start_time" name="start_time" value="09:00" min="00:00" max="24:00" required />
+
+    <label for="end">End date:</label>
+    <input type="date" id="end_date" name="end_date" value="2024-05-08" min="2024-01-01" />
+    <input type="time" id="end_time" name="end_time" value="18:00" min="00:00" max="24:00" required />
+    <input type="submit" value="Submit">
+</form>
+<!--<form action="{% url 'show_timeseries_db_data' %}" method="post">-->
+<!--    {% csrf_token %}-->
+<!--    {{ form }}-->
+<!--    <input type="submit" value="Submit">-->
+<!--</form>-->
 
 {% endblock content %}

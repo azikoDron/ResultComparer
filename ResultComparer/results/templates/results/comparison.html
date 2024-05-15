@@ -5,56 +5,7 @@
 
 
 {% block content %}
-    {% load static %}
-    {% for tran in results.keys %}
-        <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
-    {% endfor %}
-
-    {% if results %}
-        <p>{{time_interval}}</p>
-
-<!--        {% for result in results %}-->
-<!--            <p>{{result.transaction}} - {{result.mean}}</p>-->
-<!--        {% endfor %}-->
-
-
-        <div id="container" style="width: 50%;">
-            <canvas id="chart" \></canvas>
-        </div>
-<script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
-<script>
-            var config = {
-                type: 'line',
-                data: {
-
-                    datasets: [
-                    {% for transactions, timedata in results.items %}
-                            {
-                            label: '{{transactions}}',
-                            data: [{% for result in timedata %}
-                                                "{{result.mean}}",
-                                            {% endfor %}],
-                            backgroundColor: "{{ colours.chart_colour_picker }}",
-                            },
-
-                    {% endfor %}
-                            ],
-                    labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
-                    },
-                options: {
-                    responsive: true
-                    }
-                };
-            window.onload = function() {
-                ctx = document.getElementById('chart').getContext('2d');
-                window.myPie = new Chart(ctx, config);
-                };
-
-        </script>
-
-
-    {% else %}
-        <p>App is currently not available</p>
-    {% endif %}
 
 {% endblock content %}
+
+

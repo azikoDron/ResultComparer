@@ -10,16 +10,17 @@ class InfluxConnect:
         pass
     pass
 # DELETE
-def gen_test_data(start_time="", end_time=""):    # delete
+def gen_test_data(start_time="", end_time="", transaction=""):  # delete
     data_dict = {}
     for i in range(10):
-        data_dict[f"tran-{i}"] = [{"time": time.strftime("%FT%H:03:%S:00Z"),
-                                  'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"},
-                                  {"time": time.strftime("%FT%H:01:%S:00Z"),
-                                   'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"},
-                                   {"time": time.strftime("%FT%H:02:%S:00Z"),
-                                   'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"}
-                                 ]
+        data_dict[f"tran-{i}"] = [
+            {"time": time.strftime("%FT%H:03:%S:00Z"),
+             'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"},
+            {"time": time.strftime("%FT%H:01:%S:00Z"),
+             'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"},
+            {"time": time.strftime("%FT%H:02:%S:00Z"),
+             'mean': f"{random.randint(10, 500)}.{random.randint(100, 9999999999999)}"}
+        ]
 
     # data_dict = str(data_dict)
     # data_dict = dict(data_dict)

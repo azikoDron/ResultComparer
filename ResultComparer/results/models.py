@@ -5,6 +5,7 @@ from .settings import TIMESERIES_DATABASES
 import datetime
 import re
 
+
 class Apps(models.Model):
     name = models.CharField(max_length=40)
     about = models.CharField(max_length=240)
@@ -23,7 +24,6 @@ class Colours(models.Model):
         return random.choice(hex_colours)
 
 
-
 class TimeSeriesDB:
     def __int__(self):
         if TIMESERIES_DATABASES["NAME"] == 'InfluxDB':
@@ -31,18 +31,25 @@ class TimeSeriesDB:
                                TIMESERIES_DATABASES["PASS"], TIMESERIES_DATABASES["SCHEMA"])
 
     def get_influx_data(self, start_time="", end_time="", percentile="95", transaction=""):  # fulfill
-        if start_time and end_time:
-            if transaction:
-                data = self.db.get_transaction_by_id(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time), transaction)
-            else:
-                data = self.db.get_all_transactions(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time))
-        else:
-            # data = db.get_all_transactions()
-            data = []
-        data_dict = {"data": data,
-                     "time_interval": self.get_data_time_interval(data)}
-        return data_dict
 
+        #  DEBUG MODE !!!!!!!!!!!
+        from .influx_db import get_influx_data
+        return get_influx_data(start_time, end_time, transaction=transaction)
+        #  DEBUG MODE !!!!!!!!!!!
+
+
+        #   PRODUCTION !!!!!!!!!!!!!!!
+        # if start_time and end_time:
+        #     if transaction:
+        #         data = self.db.get_transaction_by_id(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time), transaction)
+        #     else:
+        #         data = self.db.get_all_transactions(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time))
+        # else:
+        #     # data = db.get_all_transactions()
+        #     data = []
+        # data_dict = {"data": data,
+        #              "time_interval": self.get_data_time_interval(data)}
+        # return data_dict
 
     @staticmethod
     def date_to_microseconds(date):
@@ -50,8 +57,9 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
-        return int((datetime.datetime.fromisoformat(date) - datetime.datetime.fromisoformat(
-            "1970-01-01T00:00:00:00Z")).total_seconds() * 1000)
+        return int((datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S:%f") -
+                    datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
+                    ).total_seconds() * 1000)
 
     @staticmethod
     def get_data_time_interval(timeseries_dict: dict):
@@ -70,19 +78,19 @@ class TimeSeriesDB:
         return sorted(list(set(time_list)))
 
 
-class Transactions(models.Model):
-    name = models.CharField(max_length=120)
-
-
-class SaveData(models.Model):
-    transaction = person = models.ForeignKey(Transactions, on_delete=models.CASCADE)
-    time = models.DateTimeField()
-    pct99 = models.FloatField(null=True)
-    pct95 = models.FloatField(null=True)
-    pct90 = models.FloatField(null=True)
-    min = models.FloatField(null=True)
-    max = models.FloatField(null=True)
-    avg = models.FloatField(null=True)
-
-    def __str__(self):
-        return {self}
+# class Transactions(models.Model):
+#     name = models.CharField(max_length=120)
+#
+#
+# class SaveData(models.Model):
+#     transaction = person = models.ForeignKey(Transactions, on_delete=models.CASCADE)
+#     time = models.DateTimeField()
+#     pct99 = models.FloatField(null=True)
+#     pct95 = models.FloatField(null=True)
+#     pct90 = models.FloatField(null=True)
+#     min = models.FloatField(null=True)
+#     max = models.FloatField(null=True)
+#     avg = models.FloatField(null=True)
+#
+#     def __str__(self):
+#         return {self}

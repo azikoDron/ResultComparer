@@ -1,41 +1,55 @@
-{% extends 'results/base.html' %}
+{% include  './index.html' %}
 
 
 {% block title %} {{app_detail}} app {% endblock title %}
 
 
 {% block content %}
-<p></p>
-<p></p>
+    {% load static %}
+<div>
+<div id="sidebar">
+    {% for tran in results.keys %}
+    <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
+    {% endfor %}
+</div>
 
-<form action="{% url 'show_timeseries_db_data' %}" method="post">
-    {% csrf_token %}
-    <label for="start">Start date:</label>
-    <input type="date" id="start_date" name="start_date" value="2024-05-08" min="2024-01-01" />
-    <input type="time" id="start_time" name="start_time" value="09:00" min="00:00" max="24:00" required />
 
-    <label for="end">End date:</label>
-    <input type="date" id="end_date" name="end_date" value="2024-05-08" min="2024-01-01" />
-    <input type="time" id="end_time" name="end_time" value="18:00" min="00:00" max="24:00" required />
-    <input type="submit" value="Submit">
-</form>
-<!--<form action="{% url 'show_timeseries_db_data' %}" method="post">-->
-<!--    {% csrf_token %}-->
-<!--    {{ form }}-->
-<!--    <input type="submit" value="Submit">-->
-<!--</form>-->
+<div class="contend">
+<div id="container" style="width: 50%;">
+    <canvas id="chart" \></canvas>
+</div>
+<script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
+<script>
+            var config = {
+                type: 'line',
+                data: {
 
-    {% if app_detail %}
-        <p>Tis is {{app_detail}} app</p>
-        <p>{{app_detail.about}}</p>
+                    datasets: [
+                    {% for transactions, timedata in results.items %}
+                            {
+                            label: '{{transactions}}',
+                            data: [{% for result in timedata %}
+                                    "{{result.mean}}",
+                                   {% endfor %}],
+                            backgroundColor: "{{ colours.chart_colour_picker }}",
+                            },
 
-    {% elif results %}
-<!--        {% for tran in results %}-->
-<!--        <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran.transaction}}</a></li>-->
-<!--        {% endfor %}-->
-    {% else %}
-        <p>App is currently not available</p>
-    {% endif %}
+                    {% endfor %}
+                            ],
+                    labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
+                    },
+                options: {
+                    responsive: true
+                    }
+                };
+            window.onload = function() {
+                ctx = document.getElementById('chart').getContext('2d');
+                window.myPie = new Chart(ctx, config);
+                };
+
+        </script>
+    </div>
+</div>
 
 
 {% endblock content %}
