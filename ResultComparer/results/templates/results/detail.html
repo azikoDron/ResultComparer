@@ -1,54 +1,63 @@
 {% include  './index.html' %}
 
 
-{% block title %} {{app_detail}} app {% endblock title %}
+{% block title %}
+<!--    {{app_detail}} app -->
+{% endblock title %}
 
 
 {% block content %}
-    {% load static %}
+
+{% load static %}
+
+<p></p>
+<p>List of API</p>
 <div>
-<div id="sidebar">
-    {% for tran in results.keys %}
-    <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
-    {% endfor %}
-</div>
-
-
-<div class="contend">
-<div id="container" style="width: 50%;">
-    <canvas id="chart" \></canvas>
-</div>
-<script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
-<script>
-            var config = {
-                type: 'line',
-                data: {
-
-                    datasets: [
-                    {% for transactions, timedata in results.items %}
-                            {
-                            label: '{{transactions}}',
-                            data: [{% for result in timedata %}
-                                    "{{result.mean}}",
-                                   {% endfor %}],
-                            backgroundColor: "{{ colours.chart_colour_picker }}",
-                            },
-
-                    {% endfor %}
-                            ],
-                    labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
-                    },
-                options: {
-                    responsive: true
-                    }
-                };
-            window.onload = function() {
-                ctx = document.getElementById('chart').getContext('2d');
-                window.myPie = new Chart(ctx, config);
-                };
-
-        </script>
+    <div style="width:20%; margin-right:80%; ">
+    <nav id="sidebar" class="sidebar">
+        <ul style="list-style-type: none; float: left;" >
+        {% for tran in results.keys %}
+        <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
+        {% endfor %}
+        </ul>
+    </nav>
     </div>
+
+<!--<div class="contend" style="margin-left:25%">-->
+    <div id="container" style="width: 80%; margin-left:20%">
+        <canvas id="chart"></canvas>
+        <script type="text/javascript" src="{% static 'results/js/Chart.js' %}"></script>
+            <script>
+                var config = {
+                    type: 'line',
+                    data: {
+
+                        datasets: [
+                        {% for transactions, timedata in results.items %}
+                                {
+                                label: '{{transactions}}',
+                                data: [{% for result in timedata %}
+                                        "{{result.mean}}",
+                                       {% endfor %}],
+                                backgroundColor: "{{ colours.chart_colour_picker }}",
+                                },
+
+                        {% endfor %}
+                                ],
+                        labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
+                        },
+                    options: {
+                        responsive: true
+                        }
+                    };
+                window.onload = function() {
+                    ctx = document.getElementById('chart').getContext('2d');
+                    window.myPie = new Chart(ctx, config);
+                    };
+
+            </script>
+        </div>
+<!--    </div>-->
 </div>
 
 

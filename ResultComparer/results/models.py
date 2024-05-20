@@ -24,6 +24,29 @@ class Colours(models.Model):
         return random.choice(hex_colours)
 
 
+
+class Transactions(models.Model):
+    name = models.CharField(max_length=120)
+
+
+class SaveDataDB(models.Model):
+    transaction = models.ForeignKey(Transactions, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    mean = models.FloatField(null=True)
+    type = models.CharField(max_length=6)
+
+    def __str__(self):
+        return self.transaction
+
+
+class CacheData(models.Model):
+    start_date = models.DateField()
+    start_time = models.TimeField()
+    end_date = models.DateField()
+    end_time = models.TimeField()
+    metrics = models.CharField(max_length=6)
+
+
 class TimeSeriesDB:
     def __int__(self):
         if TIMESERIES_DATABASES["NAME"] == 'InfluxDB':
@@ -57,6 +80,7 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
+        print(date)
         return int((datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S:%f") -
                     datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
                     ).total_seconds() * 1000)
@@ -77,20 +101,3 @@ class TimeSeriesDB:
                         continue
         return sorted(list(set(time_list)))
 
-
-# class Transactions(models.Model):
-#     name = models.CharField(max_length=120)
-#
-#
-# class SaveData(models.Model):
-#     transaction = person = models.ForeignKey(Transactions, on_delete=models.CASCADE)
-#     time = models.DateTimeField()
-#     pct99 = models.FloatField(null=True)
-#     pct95 = models.FloatField(null=True)
-#     pct90 = models.FloatField(null=True)
-#     min = models.FloatField(null=True)
-#     max = models.FloatField(null=True)
-#     avg = models.FloatField(null=True)
-#
-#     def __str__(self):
-#         return {self}

@@ -5,7 +5,8 @@
 {% endblock additional_css %}
 
 {% block navbar %}
-<nav id="top_navbar">
+<div>
+<nav id="top_navbar" class="top_navbar">
     <ul class="top_navbar_links">
         <li><a href="{% url 'index' %}">Главная</a></li>
         <li class="dropdown">
@@ -20,4 +21,5 @@
         <li class=="login_button" style="float:right"><a href="/admin">Login</a></li>
     </ul>
 </nav>
+</div>
 {% endblock navbar %}
