@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .models import Apps, Colours, TimeSeriesDB
+from .models import Apps, Colours, TimeSeriesDB, save_data_to_db
 from .forms import DateForm
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -26,14 +26,11 @@ def detail(request, app_id):
 
 
 def show_timeseries_db_data(request, transaction_id="", save_data=False):
-    global tmp_cache_data
     db = TimeSeriesDB()
     form = DateForm()
+    data = {}
     if request.method == "POST":
-        # tmp_cache_data["start_date_time"] = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
-        # tmp_cache_data["end_date_time"] = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
-        # tmp_cache_data["metrics_type"] = request.POST["metric"]
-        # print("------------------------------------:  ", start_time, end_time)
+
         try:
             form.initial["start_date"] = request.POST['start_date']
             form.initial["start_time"] = request.POST['start_time']
@@ -42,23 +39,15 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
             form.initial["metric"] = request.POST['metric']
         except KeyError:
             print(KeyError)
-        start_date_time = f"{form.initial["start_date"]}T{form.initial["start_time"]}:00:00Z"
-        end_date_time = f"{form.initial["end_date"]}T{form.initial["end_time"]}:00:00Z"
 
-        print("-----------------POST-------------------:  ", request.POST)
+    start_date_time = f"{form.initial['start_date']}T{form.initial['start_time']}:00:00Z"
+    end_date_time = f"{form.initial['end_date']}T{form.initial['end_time']}:00:00Z"
 
-
-        data = db.get_influx_data(start_time=start_date_time,
-                                  end_time=end_date_time,
-                                  transaction=transaction_id)
-    else:
-        start_date_time = f"{form.initial["start_date"]}T{form.initial["start_time"]}:00:00Z"
-        end_date_time = f"{form.initial["end_date"]}T{form.initial["end_time"]}:00:00Z"
-        #   print("+++++++++++++++++metrics", tmp_cache_data)
-        data = db.get_influx_data(start_time=start_date_time,
-                                  end_time=end_date_time,
-                                  transaction=transaction_id)
-
+    data = db.get_influx_data(start_time=start_date_time,
+                                      end_time=end_date_time,
+                                      transaction=transaction_id)
+    if "save_button" in request.POST.keys():
+        save_data_to_db(data["data"], "regress_1", form.initial["metric"])
     return render(request, 'results/detail.html', {"results": data["data"],
                                                            "time_interval": data["time_interval"],
                                                            "colours": Colours(),
@@ -66,6 +55,6 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
                                                             "save_button": True})
 
 def save_data(request):
-    print("----------------------- SAVE DATA----------", request.POST)
+    #   print("----------------------- SAVE DATA----------", request.POST)
     messages.info(request, 'Your password has been changed successfully!')
     return redirect("show_timeseries_db_data")

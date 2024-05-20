@@ -14,7 +14,7 @@ class Apps(models.Model):
         return self.name
 
 
-class Colours(models.Model):
+class Colours:
     def chart_colour_picker(self):
         hex_colours = ["#28ff00", "#fa0000", "#00defa", "#3700fa", "#fa9a00", "#03fa00", "#514b76", "#defa00",
                        "#2200fa",
@@ -24,27 +24,47 @@ class Colours(models.Model):
         return random.choice(hex_colours)
 
 
-
-class Transactions(models.Model):
+#   SAVE DATA MODEL
+class TestID(models.Model):
     name = models.CharField(max_length=120)
 
+    def __str__(self):
+        return self.name
 
-class SaveDataDB(models.Model):
-    transaction = models.ForeignKey(Transactions, on_delete=models.CASCADE)
+
+class TestTransactions(models.Model):
+    name = models.CharField(max_length=120)
+    members = models.ManyToManyField(TestID, through="TestMetrics")
+
+    def __str__(self):
+        return self.name
+
+
+class TestMetrics(models.Model):
+    test_id = models.ForeignKey(TestID, on_delete=models.CASCADE)
+    transaction = models.ForeignKey(TestTransactions, on_delete=models.CASCADE)
     time = models.DateTimeField()
     mean = models.FloatField(null=True)
     type = models.CharField(max_length=6)
 
-    def __str__(self):
-        return self.transaction
+#   END SAVE DATA MODEl
 
 
-class CacheData(models.Model):
-    start_date = models.DateField()
-    start_time = models.TimeField()
-    end_date = models.DateField()
-    end_time = models.TimeField()
-    metrics = models.CharField(max_length=6)
+def save_data_to_db(data, test_id, percentile):
+    test_id = TestID.objects.create(name=test_id)
+    for i, j in data.items():
+        transaction = TestTransactions.objects.create(name=i)
+        for k in j:
+            dt = TestMetrics(
+                test_id=test_id,
+                transaction=transaction,
+                time=k["time"],
+                mean=k["mean"],
+                type=percentile
+            )
+            dt.save()
+
+
 
 
 class TimeSeriesDB:
@@ -80,7 +100,6 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
-        print(date)
         return int((datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S:%f") -
                     datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
                     ).total_seconds() * 1000)

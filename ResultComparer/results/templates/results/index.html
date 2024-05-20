@@ -18,9 +18,9 @@
     <p></p>
     <p>Select time interval</p>
 
+    <!-- TIME INTERVAL SELECT FORM   -->
     <form action="{% url 'show_timeseries_db_data' %}" method="post">
         {% csrf_token %}
-<!--            {{time_form}}-->
           <div class="choice_container" style="margin: 1%">
               <div class="row">
                   {% for field in time_form  %}
@@ -30,32 +30,14 @@
                   {% endfor %}
               </div>
           </div>
-<!--        <input type="date" id="start_date" name="start_date" value={{start_date_time}} min="2024-01-01" />-->
-<!--        <input type="time" id="start_time" name="start_time" value="09:00" min="00:00" max="24:00" required />-->
-<!--        <p></p>-->
-<!--        <label for="end_date">End date:</label>-->
-<!--        <input type="date" id="end_date" name="end_date" value="2024-05-08" min="2024-01-01" />-->
-<!--        <input type="time" id="end_time" name="end_time" value="18:00" min="00:00" max="24:00" required />-->
-<!--        <label for="metric">Metric:</label>-->
-<!--            <select id="metric" name="metric">-->
-<!--                <option value="pct95">pct95</option>-->
-<!--                <option value="pct99">pct99</option>-->
-<!--                <option value="pct90">pct90</option>-->
-<!--                <option value="max">max</option>-->
-<!--                <option value="mean">mean</option>-->
-<!--                <option value="min">min</option>-->
-<!--            </select>-->
-<!--        <input type="checkbox" id="savedata" name="savedata" value="Yes">-->
-<!--        <label for="savedata">Save data ?</label>-->
         <input type="submit" value="Submit">
+
+        <!-- SAVING DATA / save_button value from views.show_timeseries_db_data()       -->
         {% if save_button %}
-             <b>Save data: </b><input type="submit" value="Save">
+             <b>Save data: </b><input type="submit" name="save_button" value="Save">
         {%endif%}
+        <!-- END SAVING       -->
+
     </form>
-<!--<form action="{% url 'show_timeseries_db_data' %}" method="post">-->
-<!--    {% csrf_token %}-->
-<!--    {{ form }}-->
-<!--    <input type="submit" value="Submit">-->
-<!--</form>-->
 </div>
 {% endblock content %}

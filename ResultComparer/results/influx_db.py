@@ -64,6 +64,3 @@ def get_influx_data(start_time="", end_time="", percentile="95", transaction="")
                  "time_interval": get_data_time_interval(data)}
     return data_dict
 
-# a = {'tran-0': [{'time': '2024-05-15T12:03:28:00Z', 'mean': '116.5648115630589'}, {'time': '2024-05-15T12:01:28:00Z', 'mean': '325.1088158346088'}, {'time': '2024-05-15T12:02:28:00Z', 'mean': '414.6569995630636'}]}
-#
-# print(get_data_time_interval(a))
