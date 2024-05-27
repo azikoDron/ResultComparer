@@ -26,7 +26,7 @@ class Colours:
 
 #   SAVE DATA MODEL
 class TestID(models.Model):
-    name = models.CharField(max_length=120)
+    name = models.CharField(max_length=120, unique=True)
 
     def __str__(self):
         return self.name
@@ -50,7 +50,7 @@ class TestMetrics(models.Model):
 #   END SAVE DATA MODEl
 
 
-def save_data_to_db(data, test_id, percentile):
+def save_test_data_to_db(data, test_id, percentile):
     test_id = TestID.objects.create(name=test_id)
     for i, j in data.items():
         transaction = TestTransactions.objects.create(name=i)
@@ -65,6 +65,12 @@ def save_data_to_db(data, test_id, percentile):
             dt.save()
 
 
+def get_test_id_list_from_db():
+    return TestID.objects.all()
+
+def get_all_test_data_from_db(test_id):
+    test = TestID.objects.get(name=test_id)
+    return test.testmetrics_set.all()
 
 
 class TimeSeriesDB:

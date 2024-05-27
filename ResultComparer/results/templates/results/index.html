@@ -15,9 +15,8 @@
 
 
 <div>
-    <p></p>
+    <br>
     <p>Select time interval</p>
-
     <!-- TIME INTERVAL SELECT FORM   -->
     <form action="{% url 'show_timeseries_db_data' %}" method="post">
         {% csrf_token %}
@@ -30,14 +29,41 @@
                   {% endfor %}
               </div>
           </div>
-        <input type="submit" value="Submit">
-
+        <input type="submit" value="Search">
+        <br>
         <!-- SAVING DATA / save_button value from views.show_timeseries_db_data()       -->
         {% if save_button %}
-             <b>Save data: </b><input type="submit" name="save_button" value="Save">
+        <div style="margin: 1%">
+            <b>Save data: </b><input id="save_btn" type="submit" onclick="myFunction()" name="save_button" value="Save">
+                <script>
+                function myFunction() {
+                  let text;
+                  const elem = document.getElementById("save_btn");
+                  let test_id = prompt("Please enter test ID:", "Regress_01.05.2024");
+                  if (test_id == null || test_id == "") {
+                    text = False;
+                  } else {
+                    text = "TEST: " + test_id;
+                  }
+                  document.getElementById("save_btn").value = text;
+                }
+                </script>
+        </div>
         {%endif%}
         <!-- END SAVING       -->
 
+        {% if test_id_list %}
+        <div style="margin: 1%">
+            <label for="test-select">Choose a test:</label>
+                <select name="test_id" id="test-select">
+                  <option value="">--Please choose test id--</option>
+                    {% for test_id in test_id_list  %}
+                        <option value="{{test_id}}">{{test_id}}</option>
+                    {% endfor %}
+                </select>
+            <input type="submit" value="Compare">
+        </div>
+        {%endif%}
     </form>
 </div>
 {% endblock content %}
