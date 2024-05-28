@@ -1,6 +1,9 @@
+from typing import Dict
+
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .models import Apps, Colours, TimeSeriesDB, save_test_data_to_db, get_test_id_list_from_db, get_all_test_data_from_db
+from .models import Apps, Colours, TimeSeriesDB, save_test_data_to_db, get_test_id_list_from_db, \
+    get_all_test_data_by_trn_from_db, get_all_test_data_grp_by_trn_from_db
 from .forms import DateForm
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -8,6 +11,15 @@ import random
 
 form = DateForm()
 ts_db = TimeSeriesDB()
+context = { "results": "",
+            "time_interval": "",
+            "colours": Colours(),
+            "time_form": form,
+            "save_button": True,
+            "start_date_time": "",
+            "end_date_time": "",
+            "test_id": "",
+           }
 
 def index(request):
     # cards = {'available_cards': available_cards.keys()}
@@ -20,14 +32,8 @@ def detail(request, app_id):
 
 
 def show_timeseries_db_data(request, transaction_id="", save_data=False):
-    global form, ts_db
-    context = {"results": "",
-               "time_interval": "",
-               "colours": Colours(),
-               "time_form": form,
-               "save_button": True,
-               "test_id_list": get_test_id_list_from_db()
-               }
+    global form, ts_db, context
+    context["test_id_list"] = get_test_id_list_from_db()
 
     if request.method == "POST":
         try:
@@ -39,11 +45,11 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
         except KeyError:
             print(KeyError)
 
-    start_date_time = f"{form.initial['start_date']}T{form.initial['start_time']}:00:00Z"
-    end_date_time = f"{form.initial['end_date']}T{form.initial['end_time']}:00:00Z"
+    context["start_date_time"] = f"{form.initial['start_date']}T{form.initial['start_time']}:00:00Z"
+    context["end_date_time"] = f"{form.initial['end_date']}T{form.initial['end_time']}:00:00Z"
 
-    data = ts_db.get_influx_data(start_time=start_date_time,
-                                end_time=end_date_time,
+    data = ts_db.get_influx_data(start_time=context["start_date_time"],
+                                end_time=context["end_date_time"],
                                 transaction=transaction_id)
     context["results"] = data["data"]
     context["time_interval"] = data["time_interval"]
@@ -61,8 +67,18 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
 
 
 def compare_test_results(request, transaction_id=""):
-        context = {}
-        context["test_data_from_db"] = get_all_test_data_from_db(request.POST["test_id"])
+        global context
+        if request.method == "POST":
+            context["test_id"] = request.POST["test_id"]
+        if transaction_id:
+            context["saved_data"] = get_all_test_data_by_trn_from_db(context["test_id"], transaction=transaction_id)
+
+            data = ts_db.get_influx_data(start_time=context["start_date_time"],
+                                         end_time=context["end_date_time"],
+                                         transaction=transaction_id)
+            context["results"] = data["data"]
+        else:
+            context["results"] = get_all_test_data_grp_by_trn_from_db(request.POST["test_id"])
         return render(request, 'results/comparison.html', context)
 
 

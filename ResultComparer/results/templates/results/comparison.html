@@ -7,7 +7,7 @@
 {% block content %}
 {% load static %}
 
-{{test_data_from_db}}
+{{test_data_from_db.mean}}
 
 <p></p>
 <p>List of API</p>
@@ -16,7 +16,7 @@
     <nav id="sidebar" class="sidebar">
         <ul style="list-style-type: none; float: left;" >
         {% for tran in results.keys %}
-        <li><a href="{% url 'show_timeseries_db_data' transaction_id=tran %}">{{tran}}</a></li>
+        <li><a href="{% url 'compare_test_results' transaction_id=tran %}">{{tran}}</a></li>
         {% endfor %}
         </ul>
     </nav>
@@ -32,16 +32,30 @@
                     data: {
 
                         datasets: [
+                        {% for transactions, timedata in saved_data.items %}
+                                {
+                                label: 'OLD:{{transactions}}',
+                                data: [{% for result in timedata %}
+                                        "{{result.mean}}",
+                                       {% endfor %}],
+                                fill: false,
+                                backgroundColor: "{{ colours.chart_colour_picker }}",
+                                tension: 0.1,
+                                },
+                        {% endfor %}
+
                         {% for transactions, timedata in results.items %}
                                 {
                                 label: '{{transactions}}',
                                 data: [{% for result in timedata %}
                                         "{{result.mean}}",
                                        {% endfor %}],
+                                fill: false,
                                 backgroundColor: "{{ colours.chart_colour_picker }}",
+                                tension: 0.1,
                                 },
-
                         {% endfor %}
+
                                 ],
                         labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
                         },
