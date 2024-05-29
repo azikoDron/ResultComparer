@@ -1,5 +1,5 @@
 import time
-import datetime
+from datetime import datetime
 import random
 
 # print(str(datetime.datetime.now()).replace(" ", "T"))
@@ -62,6 +62,57 @@ def chart_colour_picker(length):
                    "#843232", "#516000"]
     return random.choice(hex_colours)
 
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 
-print((datetime.datetime.strptime("2024-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f") -
-      datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds())
+print((datetime.datetime.strptime("2024-05-28T18:02:00:00", "%Y-%m-%dT%H:%M:%S:%f") -
+      datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds() - 10800)
+
+print((datetime.datetime.strptime("1970-01-01T03:00:00:00", "%Y-%m-%dT%H:%M:%S:%f") - datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds())
+
+
+print(time.strptime("18:02:00", "%H:%M:%S"))
+# print(datetime.datetime.strptime("18:00:00", "%H:%M:%S").astimezone())
+
+# print(datetime.timezone.fromutc("18:00:00"))
+
+
+
+from datetime import datetime
+from dateutil import tz
+
+# METHOD 1: Hardcode zones:
+#from_zone = tz.gettz('UTC')
+# to_zone = tz.gettz('Europe/Moscow')
+
+# METHOD 2: Auto-detect zones:
+from_zone = tz.tzutc()
+to_zone = tz.tzlocal()
+
+# Since datetime.utcnow() is deprecated since version 3.12 use datetime.now()
+# utc = datetime.now()
+utc = datetime.strptime('2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S')
+
+# Tell the datetime object that it's in UTC time zone since
+# datetime objects are 'naive' by default
+utc = utc.replace(tzinfo=from_zone)
+
+# Convert time zone
+central = utc.astimezone(to_zone)
+
+print(utc, " --------------- ", central)
+
+
+def convert_timezone(date_time=""):
+    """
+    '2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S'
+    """
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+    utc = datetime.strptime('2011-01-21 02:37:21:00', '%Y-%m-%d %H:%M:%S')
+    utc = utc.replace(tzinfo=from_zone)
+    utc = utc.replace(tzinfo=from_zone)
+    return utc.astimezone(to_zone)
+
+
+print(convert_timezone())

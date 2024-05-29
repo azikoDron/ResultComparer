@@ -2,9 +2,9 @@ from django.db import models
 import random
 from .influx_db import InfluxConnect
 from .settings import TIMESERIES_DATABASES
-import datetime
+from datetime import datetime
 import re
-
+from dateutil import tz
 
 class Apps(models.Model):
     name = models.CharField(max_length=40)
@@ -134,9 +134,9 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
-        return int((datetime.datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
+        return int(((datetime.datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
                     datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
-                    ).total_seconds() * 1000)
+                    ).total_seconds() - 10800) * 1000)
 
     @staticmethod
     def get_data_time_interval(timeseries_dict: dict):
@@ -147,10 +147,25 @@ class TimeSeriesDB:
         for i, j in timeseries_dict.items():
             for k in j:
                 for t in k.values():
-                    s = re.findall("[0-9]{2}:[0-9]{2}:[0-9]{2}", t)
+                    t = t.replace("T", " ").replace(":00Z", "")
+                    t = TimeSeriesDB.convert_timezone(t)
+                    s = re.findall("[0-9]{2}:[0-9]{2}:[0-9]{2}", str(t))
                     try:
                         time_list.append(s[0])  # ADD [0:5]
                     except IndexError:
                         continue
         return sorted(list(set(time_list)))
+
+    @staticmethod
+    def convert_timezone(date_time):
+        """
+        '2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S'
+        """
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        utc = datetime.strptime('2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S')
+        utc = utc.replace(tzinfo=from_zone)
+        utc = utc.replace(tzinfo=from_zone)
+        return utc.astimezone(to_zone)
+
 
