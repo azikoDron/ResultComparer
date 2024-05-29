@@ -9,17 +9,18 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 import random
 
-form = DateForm()
+# form = DateForm()
 ts_db = TimeSeriesDB()
 context = { "results": "",
             "time_interval": "",
             "colours": Colours(),
-            "time_form": form,
+            "time_form": "",
             "save_button": True,
             "start_date_time": "",
             "end_date_time": "",
             "test_id": "",
            }
+
 
 def index(request):
     # cards = {'available_cards': available_cards.keys()}
@@ -32,32 +33,37 @@ def detail(request, app_id):
 
 
 def show_timeseries_db_data(request, transaction_id="", save_data=False):
-    global form, ts_db, context
+    global ts_db, context
     context["test_id_list"] = get_test_id_list_from_db()
 
     if request.method == "POST":
+        # context["start_date_time"] = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
+        # context["end_date_time"] = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
         try:
-            form.initial["start_date"] = request.POST['start_date']
-            form.initial["start_time"] = request.POST['start_time']
-            form.initial["end_date"] = request.POST['end_date']
-            form.initial["end_time"] = request.POST['end_time']
-            form.initial["metric"] = request.POST['metric']
+            context["time_form"] = DateForm()
+            context["time_form"].initial["start_date"] = request.POST['start_date']
+            context["time_form"].initial["start_time"] = request.POST['start_time']
+            context["time_form"].initial["end_date"] = request.POST['end_date']
+            context["time_form"].initial["end_time"] = request.POST['end_time']
+            context["time_form"].initial["metric"] = request.POST['metric']
+            context["start_date_time"] = f"{context['time_form'].initial['start_date']}T{context['time_form'].initial['start_time']}:00:00Z"
+            context["end_date_time"] = f"{context['time_form'].initial['end_date']}T{context['time_form'].initial['end_time']}:00:00Z"
         except KeyError:
             print(KeyError)
-
-    context["start_date_time"] = f"{form.initial['start_date']}T{form.initial['start_time']}:00:00Z"
-    context["end_date_time"] = f"{form.initial['end_date']}T{form.initial['end_time']}:00:00Z"
+    print(request.method, context["start_date_time"], context["time_form"].initial['start_date'], context["time_form"].initial['start_date'])
+    # context["start_date_time"] = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
+    # context["end_date_time"] = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
 
     data = ts_db.get_influx_data(start_time=context["start_date_time"],
-                                end_time=context["end_date_time"],
-                                transaction=transaction_id)
+                                 end_time=context["end_date_time"],
+                                 transaction=transaction_id)
     context["results"] = data["data"]
     context["time_interval"] = data["time_interval"]
     #   SAVE TEST RESULTS
     if "save_button" in request.POST.keys():
         if "TEST" in request.POST["save_button"]:
             test_id = str(request.POST["save_button"]).replace("TEST: ", "")
-            save_test_data_to_db(data["data"], test_id, form.initial["metric"])
+            save_test_data_to_db(data["data"], test_id, context["time_form"].initial["metric"])
     #   COMPARISON
     if "test_id" in request.POST.keys():
         if request.POST["test_id"]:

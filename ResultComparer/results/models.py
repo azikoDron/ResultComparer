@@ -101,13 +101,14 @@ def get_all_test_data_by_trn_from_db(test_id, transaction):
 
 
 class TimeSeriesDB:
-    def __int__(self):
+    def __init__(self):
+
         if TIMESERIES_DATABASES["NAME"] == 'InfluxDB':
             self.db = InfluxConnect(TIMESERIES_DATABASES["HOST"], TIMESERIES_DATABASES["USER"],
                                TIMESERIES_DATABASES["PASS"], TIMESERIES_DATABASES["SCHEMA"])
 
     def get_influx_data(self, start_time="", end_time="", percentile="95", transaction=""):  # fulfill
-
+        print(TIMESERIES_DATABASES)
         #  DEBUG MODE !!!!!!!!!!!
         from .influx_db import get_influx_data
         return get_influx_data(start_time, end_time, transaction=transaction)
@@ -133,7 +134,7 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
-        return int((datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S:%f") -
+        return int((datetime.datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
                     datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
                     ).total_seconds() * 1000)
 
