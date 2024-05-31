@@ -37,8 +37,6 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
     context["test_id_list"] = get_test_id_list_from_db()
 
     if request.method == "POST":
-        # context["start_date_time"] = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
-        # context["end_date_time"] = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
         try:
             context["time_form"] = DateForm()
             context["time_form"].initial["start_date"] = request.POST['start_date']
@@ -50,9 +48,6 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
             context["end_date_time"] = f"{context['time_form'].initial['end_date']}T{context['time_form'].initial['end_time']}:00:00Z"
         except KeyError:
             print(KeyError)
-    print(request.method, context["start_date_time"], context["time_form"].initial['start_date'], context["time_form"].initial['start_date'])
-    # context["start_date_time"] = f"{request.POST['start_date']}T{request.POST['start_time']}:00:00Z"
-    # context["end_date_time"] = f"{request.POST['end_date']}T{request.POST['end_time']}:00:00Z"
 
     data = ts_db.get_influx_data(start_time=context["start_date_time"],
                                  end_time=context["end_date_time"],
@@ -77,8 +72,9 @@ def compare_test_results(request, transaction_id=""):
         if request.method == "POST":
             context["test_id"] = request.POST["test_id"]
         if transaction_id:
+            # SAVED DATA
             context["saved_data"] = get_all_test_data_by_trn_from_db(context["test_id"], transaction=transaction_id)
-
+            # INFLUX DATA
             data = ts_db.get_influx_data(start_time=context["start_date_time"],
                                          end_time=context["end_date_time"],
                                          transaction=transaction_id)

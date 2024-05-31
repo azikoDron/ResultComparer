@@ -88,9 +88,11 @@ def get_all_test_data_grp_by_trn_from_db(test_id):
 
 
 def get_all_test_data_by_trn_from_db(test_id, transaction):
+    print("+9++++++++++++++++++++++++++++++++++",test_id)
     data = {}
     test = TestID.objects.get(name=test_id)
     tr = TestTransactions.objects.filter(test_id=test, name=transaction)[0]
+    # tr = TestTransactions.objects.get(test_id=test, name=transaction)
     res = tr.testmetrics_set.all()
     for i in res:
         try:
@@ -108,25 +110,17 @@ class TimeSeriesDB:
                                TIMESERIES_DATABASES["PASS"], TIMESERIES_DATABASES["SCHEMA"])
 
     def get_influx_data(self, start_time="", end_time="", percentile="95", transaction=""):  # fulfill
-        print(TIMESERIES_DATABASES)
-        #  DEBUG MODE !!!!!!!!!!!
-        from .influx_db import get_influx_data
-        return get_influx_data(start_time, end_time, transaction=transaction)
-        #  DEBUG MODE !!!!!!!!!!!
-
-
-        #   PRODUCTION !!!!!!!!!!!!!!!
-        # if start_time and end_time:
-        #     if transaction:
-        #         data = self.db.get_transaction_by_id(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time), transaction)
-        #     else:
-        #         data = self.db.get_all_transactions(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time))
-        # else:
-        #     # data = db.get_all_transactions()
-        #     data = []
-        # data_dict = {"data": data,
-        #              "time_interval": self.get_data_time_interval(data)}
-        # return data_dict
+        if start_time and end_time:
+            if transaction:
+                data = self.db.get_transaction_by_id(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time), transaction)
+            else:
+                data = self.db.get_all_transactions(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time))
+        else:
+            # data = db.get_all_transactions()
+            data = []
+        data_dict = {"data": data,
+                     "time_interval": self.get_data_time_interval(data)}
+        return data_dict
 
     @staticmethod
     def date_to_microseconds(date):
@@ -134,8 +128,8 @@ class TimeSeriesDB:
         date: 2024-05-08T09:00:00:00Z
         return: 1715158800000
         """
-        return int(((datetime.datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
-                    datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
+        return int(((datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
+                    datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
                     ).total_seconds() - 10800) * 1000)
 
     @staticmethod
@@ -146,14 +140,14 @@ class TimeSeriesDB:
         time_list = []
         for i, j in timeseries_dict.items():
             for k in j:
-                for t in k.values():
-                    t = t.replace("T", " ").replace(":00Z", "")
-                    t = TimeSeriesDB.convert_timezone(t)
-                    s = re.findall("[0-9]{2}:[0-9]{2}:[0-9]{2}", str(t))
-                    try:
-                        time_list.append(s[0])  # ADD [0:5]
-                    except IndexError:
-                        continue
+                t = str(k['time']).replace("T", " ").replace("Z", "")
+                print("------------------------------", t)
+                t = TimeSeriesDB.convert_timezone(t)
+                s = re.findall("[0-9]{2}:[0-9]{2}:[0-9]{2}", str(t).replace("+03:00", ""))
+                try:
+                    time_list.append(s[0])  # ADD [0:5]
+                except IndexError:
+                    continue
         return sorted(list(set(time_list)))
 
     @staticmethod
@@ -161,9 +155,9 @@ class TimeSeriesDB:
         """
         '2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S'
         """
-        from_zone = tz.tzutc()
-        to_zone = tz.tzlocal()
-        utc = datetime.strptime('2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S')
+        from_zone = tz.gettz('UTC')
+        to_zone = tz.gettz('Europe/Moscow')
+        utc = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
         utc = utc.replace(tzinfo=from_zone)
         utc = utc.replace(tzinfo=from_zone)
         return utc.astimezone(to_zone)

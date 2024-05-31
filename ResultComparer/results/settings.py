@@ -1,5 +1,5 @@
 TIMESERIES_DATABASES = {
-    "NAME": "",
+    "NAME": "InfluxDB",
     "HOST": "",
     "USER": "",
     "PASS": "",
