@@ -1,13 +1,13 @@
 from django import forms
-
+from datetime import datetime
 
 
 class DateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(DateForm, self).__init__(*args, **kwargs)
-        self.initial['start_date'] = '2024-05-08'
+        self.initial['start_date'] = datetime.now().strftime('%Y-%m-%d')
         self.initial['start_time'] = '09:00'
-        self.initial['end_date'] = '2024-05-08'
+        self.initial['end_date'] = datetime.now().strftime('%Y-%m-%d')
         self.initial['end_time'] = '18:00'
         self.initial['metric'] = 'pct95'
 

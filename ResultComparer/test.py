@@ -23,7 +23,7 @@ def gen_test_data():
 
 
 
-import datetime
+
 
 def date_range(
         begin_time,
@@ -35,13 +35,13 @@ def date_range(
     if out_date_fmt is None:
         out_date_fmt = in_date_fmt
 
-    begin_time = datetime.datetime.strptime(begin_time, in_date_fmt)
-    end_time = datetime.datetime.strptime(end_time, in_date_fmt)
+    begin_time = datetime.strptime(begin_time, in_date_fmt)
+    end_time = datetime.strptime(end_time, in_date_fmt)
 
     delta_time = (end_time - begin_time)
-    origin_time = datetime.datetime.strptime('0', '%S')
+    origin_time = datetime.strptime('0', '%S')
     step_time = (
-        datetime.datetime.strptime(step_time, in_date_fmt) - origin_time)
+        datetime.strptime(step_time, in_date_fmt) - origin_time)
 
     if upper_bound:
         upper_bound = step_time.seconds
@@ -51,9 +51,9 @@ def date_range(
            begin_time +
            datetime.timedelta(seconds=i)).strftime(out_date_fmt)
 
-my_date_range = list(date_range('09:30', '16:00', '00:01'))
-
-
+# my_date_range = list(date_range('09:30', '16:00', '00:01'))
+#
+#
 
 
 def chart_colour_picker(length):
@@ -65,10 +65,10 @@ def chart_colour_picker(length):
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 
-print((datetime.datetime.strptime("2024-05-28T18:02:00:00", "%Y-%m-%dT%H:%M:%S:%f") -
-      datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds() - 10800)
+print((datetime.strptime("2024-05-28T18:02:00:00", "%Y-%m-%dT%H:%M:%S:%f") -
+      datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds() - 10800)
 
-print((datetime.datetime.strptime("1970-01-01T03:00:00:00", "%Y-%m-%dT%H:%M:%S:%f") - datetime.datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds())
+print((datetime.strptime("1970-01-01T03:00:00:00", "%Y-%m-%dT%H:%M:%S:%f") - datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")).total_seconds())
 
 
 print(time.strptime("18:02:00", "%H:%M:%S"))
@@ -78,7 +78,6 @@ print(time.strptime("18:02:00", "%H:%M:%S"))
 
 
 
-from datetime import datetime
 from dateutil import tz
 
 # METHOD 1: Hardcode zones:
@@ -115,4 +114,7 @@ def convert_timezone(date_time=""):
     return utc.astimezone(to_zone)
 
 
-print(convert_timezone())
+print(datetime.now().strftime('%Y-%m-%d'))
+
+for j in range(30):
+    print(str(j / 10).replace('.', ''))

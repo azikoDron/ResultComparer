@@ -47,8 +47,13 @@
                         labels: [{% for time in time_interval %} '{{ time }}', {% endfor %}],
                         },
                     options: {
-                        responsive: true
-                        }
+                        responsive: true,
+                        plugins: {
+                            legend:{
+                                position: 'left',
+                                },
+                            },
+                        },
                     };
                 window.onload = function() {
                     ctx = document.getElementById('chart').getContext('2d');

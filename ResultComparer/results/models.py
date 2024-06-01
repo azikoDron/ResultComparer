@@ -1,10 +1,6 @@
 from django.db import models
 import random
-from .influx_db import InfluxConnect
-from .settings import TIMESERIES_DATABASES
-from datetime import datetime
-import re
-from dateutil import tz
+
 
 class Apps(models.Model):
     name = models.CharField(max_length=40)
@@ -12,16 +8,6 @@ class Apps(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Colours:
-    def chart_colour_picker(self):
-        hex_colours = ["#28ff00", "#fa0000", "#00defa", "#3700fa", "#fa9a00", "#03fa00", "#514b76", "#defa00",
-                       "#2200fa",
-                       "#fa4c00", "#be00fa", "#fa0051", "#00b4fa", "#c400fa", "#5c5b45", "#4b764f", "#4b7276",
-                       "#764b6a",
-                       "#843232", "#516000"]
-        return random.choice(hex_colours)
 
 
 #   SAVE DATA MODEL
@@ -84,15 +70,14 @@ def get_all_test_data_grp_by_trn_from_db(test_id):
             data[i.transaction].append(i)
         except KeyError:
             data[i.transaction] = [i]
+    # print(data)
     return data
 
 
-def get_all_test_data_by_trn_from_db(test_id, transaction):
-    print("+9++++++++++++++++++++++++++++++++++",test_id)
+def get_test_data_by_trn_from_db(test_id, transaction):
     data = {}
     test = TestID.objects.get(name=test_id)
     tr = TestTransactions.objects.filter(test_id=test, name=transaction)[0]
-    # tr = TestTransactions.objects.get(test_id=test, name=transaction)
     res = tr.testmetrics_set.all()
     for i in res:
         try:
@@ -101,65 +86,5 @@ def get_all_test_data_by_trn_from_db(test_id, transaction):
             data[i.transaction] = [i]
     return data
 
-
-class TimeSeriesDB:
-    def __init__(self):
-
-        if TIMESERIES_DATABASES["NAME"] == 'InfluxDB':
-            self.db = InfluxConnect(TIMESERIES_DATABASES["HOST"], TIMESERIES_DATABASES["USER"],
-                               TIMESERIES_DATABASES["PASS"], TIMESERIES_DATABASES["SCHEMA"])
-
-    def get_influx_data(self, start_time="", end_time="", percentile="95", transaction=""):  # fulfill
-        if start_time and end_time:
-            if transaction:
-                data = self.db.get_transaction_by_id(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time), transaction)
-            else:
-                data = self.db.get_all_transactions(self.date_to_microseconds(start_time), self.date_to_microseconds(end_time))
-        else:
-            # data = db.get_all_transactions()
-            data = []
-        data_dict = {"data": data,
-                     "time_interval": self.get_data_time_interval(data)}
-        return data_dict
-
-    @staticmethod
-    def date_to_microseconds(date):
-        """
-        date: 2024-05-08T09:00:00:00Z
-        return: 1715158800000
-        """
-        return int(((datetime.strptime(date.replace("Z", ""), "%Y-%m-%dT%H:%M:%S:%f") -
-                    datetime.strptime("1970-01-01T00:00:00:00", "%Y-%m-%dT%H:%M:%S:%f")
-                    ).total_seconds() - 10800) * 1000)
-
-    @staticmethod
-    def get_data_time_interval(timeseries_dict: dict):
-        """
-        return: sorted list of time without doubles
-        """
-        time_list = []
-        for i, j in timeseries_dict.items():
-            for k in j:
-                t = str(k['time']).replace("T", " ").replace("Z", "")
-                print("------------------------------", t)
-                t = TimeSeriesDB.convert_timezone(t)
-                s = re.findall("[0-9]{2}:[0-9]{2}:[0-9]{2}", str(t).replace("+03:00", ""))
-                try:
-                    time_list.append(s[0])  # ADD [0:5]
-                except IndexError:
-                    continue
-        return sorted(list(set(time_list)))
-
-    @staticmethod
-    def convert_timezone(date_time):
-        """
-        '2011-01-21 02:37:21', '%Y-%m-%d %H:%M:%S'
-        """
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('Europe/Moscow')
-        utc = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
-        utc = utc.replace(tzinfo=from_zone)
-        utc = utc.replace(tzinfo=from_zone)
-        return utc.astimezone(to_zone)
 
 

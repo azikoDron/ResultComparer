@@ -1,13 +1,14 @@
 from typing import Dict
-
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .models import Apps, Colours, TimeSeriesDB, save_test_data_to_db, get_test_id_list_from_db, \
-    get_all_test_data_by_trn_from_db, get_all_test_data_grp_by_trn_from_db
-from .forms import DateForm
 from django.contrib import messages
+from .models import Apps, save_test_data_to_db, get_test_id_list_from_db, \
+    get_test_data_by_trn_from_db, get_all_test_data_grp_by_trn_from_db
+from .forms import DateForm
+from .influx_db import TimeSeriesDB
+from .mods import Colours
 from django.http import HttpResponseRedirect
-import random
+
 
 # form = DateForm()
 ts_db = TimeSeriesDB()
@@ -59,8 +60,9 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
         if "TEST" in request.POST["save_button"]:
             test_id = str(request.POST["save_button"]).replace("TEST: ", "")
             save_test_data_to_db(data["data"], test_id, context["time_form"].initial["metric"])
+
     #   COMPARISON
-    if "test_id" in request.POST.keys():
+    if "test_id" in request.POST.keys() and "compare_button" in request.POST.keys():
         if request.POST["test_id"]:
             return compare_test_results(request)
 
@@ -70,17 +72,19 @@ def show_timeseries_db_data(request, transaction_id="", save_data=False):
 def compare_test_results(request, transaction_id=""):
         global context
         if request.method == "POST":
+            print(request.POST)
             context["test_id"] = request.POST["test_id"]
+        # SAVED DATA
         if transaction_id:
-            # SAVED DATA
-            context["saved_data"] = get_all_test_data_by_trn_from_db(context["test_id"], transaction=transaction_id)
-            # INFLUX DATA
-            data = ts_db.get_influx_data(start_time=context["start_date_time"],
+            context["saved_data"] = get_test_data_by_trn_from_db(context["test_id"], transaction=transaction_id)
+        else:
+            context["saved_data"] = get_all_test_data_grp_by_trn_from_db(request.POST["test_id"])
+        # INFLUX DATA
+        data = ts_db.get_influx_data(start_time=context["start_date_time"],
                                          end_time=context["end_date_time"],
                                          transaction=transaction_id)
-            context["results"] = data["data"]
-        else:
-            context["results"] = get_all_test_data_grp_by_trn_from_db(request.POST["test_id"])
+        context["results"] = data["data"]
+
         return render(request, 'results/comparison.html', context)
 
 
